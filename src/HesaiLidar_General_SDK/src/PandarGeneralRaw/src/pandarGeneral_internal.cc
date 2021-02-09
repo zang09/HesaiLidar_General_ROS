@@ -1559,7 +1559,9 @@ void PandarGeneral_Internal::CalcQTPointXYZIT(HS_LIDAR_QT_Packet *pkt, int block
     point.intensity = unit.intensity;
 
     if ("realtime" == m_sTimestampType) {
-      point.timestamp = m_dPktTimestamp;
+      point.timestamp = m_dPktTimestamp + \
+          (static_cast<double>(blockQTOffsetSingle_[blockid] + laserQTOffset_[i]) / \
+          1000000.0f);
     }
     else {
       point.timestamp = unix_second + \
