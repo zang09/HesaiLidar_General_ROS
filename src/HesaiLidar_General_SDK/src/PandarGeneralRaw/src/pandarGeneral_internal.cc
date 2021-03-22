@@ -1290,8 +1290,7 @@ void PandarGeneral_Internal::CalcPointXYZIT(Pandar40PPacket *pkt, int blockid,
                                         boost::shared_ptr<PPointCloud> cld) {
   Pandar40PBlock *block = &pkt->blocks[blockid];
 
-  double unix_second =
-      static_cast<double>(mktime(&pkt->t) + tz_second_);
+  double unix_second =  static_cast<double>(mktime(&pkt->t) + tz_second_);
 
   for (int i = 0; i < LASER_COUNT; ++i) {
     /* for all the units in a block */
@@ -1559,25 +1558,32 @@ void PandarGeneral_Internal::CalcQTPointXYZIT(HS_LIDAR_QT_Packet *pkt, int block
     point.intensity = unit.intensity;
 
     if ("realtime" == m_sTimestampType) {
-      point.timestamp = m_dPktTimestamp + \
-          (static_cast<double>(blockQTOffsetSingle_[blockid] + laserQTOffset_[i]) / \
-          1000000.0f);
+      if (pkt->echo == 0x05) {
+        point.timestamp = m_dPktTimestamp + \
+                          (static_cast<double>(blockQTOffsetDual_[blockid] + laserQTOffset_[i]) / \
+                          1000000.0f);
+      }
+      else {
+        point.timestamp = m_dPktTimestamp + \
+                          (static_cast<double>(blockQTOffsetSingle_[blockid] + laserQTOffset_[i]) / \
+                          1000000.0f);
+      }
     }
     else {
       point.timestamp = unix_second + \
-        (static_cast<double>(pkt->timestamp)) / 1000000.0;
+                        (static_cast<double>(pkt->timestamp)) / 1000000.0;
 
       if (pkt->echo == 0x05) {
         // dual return, block 0&1 (2&3 , 4*5 ...)'s timestamp is the same.
         // dual:0x05, single:0x00
-        point.timestamp =
-            point.timestamp + (static_cast<double>(blockQTOffsetDual_[blockid] +
-                                                  laserQTOffset_[i]) /
-                              1000000.0f);
-      } else {
         point.timestamp = point.timestamp + \
-            (static_cast<double>(blockQTOffsetSingle_[blockid] + laserQTOffset_[i]) / \
-            1000000.0f);
+                          (static_cast<double>(blockQTOffsetDual_[blockid] + laserQTOffset_[i]) / \
+                          1000000.0f);
+      }
+      else {
+        point.timestamp = point.timestamp + \
+                          (static_cast<double>(blockQTOffsetSingle_[blockid] + laserQTOffset_[i]) / \
+                          1000000.0f);
       }
     }
 
@@ -1644,23 +1650,30 @@ void PandarGeneral_Internal::CalcXTPointXYZIT(HS_LIDAR_XT_Packet *pkt, int block
     point.intensity = unit.intensity;
 
     if ("realtime" == m_sTimestampType) {
+      if (pkt->echo == 0x39) {
+        point.timestamp = m_dPktTimestamp + \
+                          (static_cast<double>(blockXTOffsetDual_[blockid] + laserXTOffset_[i]) / \
+                          1000000.0f); // t0 + ((3.28-50*(8-blockid)/2) + (1.512*(channel-1)+0.28)) / 1000000(micro sec->sec)
+      }
+      else {
         point.timestamp = m_dPktTimestamp + \
                           (static_cast<double>(blockXTOffsetSingle_[blockid] + laserXTOffset_[i]) / \
-                          1000000.0f);
+                          1000000.0f); // t0 + ((3.28-50*(8-blockid)) + (1.512*(channel-1)+0.28)) / 1000000(micro sec->sec)
+      }
     }
     else {
       point.timestamp = unix_second + \
         (static_cast<double>(pkt->timestamp)) / 1000000.0;
 
       if (pkt->echo == 0x39) {
-        point.timestamp =
-            point.timestamp + (static_cast<double>(blockXTOffsetDual_[blockid] +
-                                                  laserXTOffset_[i]) /
-                              1000000.0f);
-      } else {
         point.timestamp = point.timestamp + \
-            (static_cast<double>(blockXTOffsetSingle_[blockid] + laserXTOffset_[i]) / \
-            1000000.0f);
+                          (static_cast<double>(blockXTOffsetDual_[blockid] + laserXTOffset_[i]) / \
+                          1000000.0f);
+      }
+      else {
+        point.timestamp = point.timestamp + \
+                          (static_cast<double>(blockXTOffsetSingle_[blockid] + laserXTOffset_[i]) / \
+                          1000000.0f);
       }
     }
 

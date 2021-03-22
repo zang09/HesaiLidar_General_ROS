@@ -100,7 +100,7 @@ Input::~Input(void) {
 
 // return : 0 - lidar
 //          1 - gps
-//          -1 - error
+//         -1 - error
 int Input::getPacket(PandarPacket *pkt) {
   struct pollfd fds[socketNumber];
   if (socketNumber == 2) {

@@ -106,6 +106,7 @@ const float blockXTOffsetSingle[HS_LIDAR_XT_BLOCK_NUMBER] = {
     3.28f - 50.0f * 0.0f
 };
 
+//channel
 const float laserXTOffset[HS_LIDAR_XT_UNIT_NUM] = {
     1.512f * 0.0f + 0.28f,
     1.512f * 1.0f + 0.28f,
