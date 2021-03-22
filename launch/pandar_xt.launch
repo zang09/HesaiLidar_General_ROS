@@ -14,7 +14,7 @@
 	<arg name="timestamp_type" default="realtime"/>
 	<arg name="data_type" default=""/>
 	<arg name="namespace" default="hesai"/>
-	<arg name="lidar_correction_file"  default="$(find hesai_lidar)/config/correction.csv"/>
+	<arg name="lidar_correction_file"  default="$(find hesai_lidar)/config/PandarXT-32.csv"/>
 
 	<node pkg="hesai_lidar" name="hesai_lidar" ns="$(arg namespace)" type="hesai_lidar_node" output="screen" >
 		<param name="pcap_file" type="string" value="$(arg pcap_file)"/>
