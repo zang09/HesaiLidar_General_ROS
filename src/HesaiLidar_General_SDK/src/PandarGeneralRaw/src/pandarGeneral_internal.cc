@@ -1629,14 +1629,24 @@ void PandarGeneral_Internal::CalcXTPointXYZIT(HS_LIDAR_XT_Packet *pkt, int block
     if(azimuth > 36000)
       azimuth -= 36000;
     float xyDistance = unit.distance * m_cos_elevation_map_[i];
+
+    /*
     point.x = static_cast<float>(xyDistance * m_sin_azimuth_map_[azimuth]);
     point.y = static_cast<float>(xyDistance * m_cos_azimuth_map_[azimuth]);
+    point.z = static_cast<float>(unit.distance * m_sin_elevation_map_[i]);
+    */
+
+    //Change Axis
+    point.x = static_cast<float>(-xyDistance * m_cos_azimuth_map_[azimuth]);
+    point.y = static_cast<float>(xyDistance * m_sin_azimuth_map_[azimuth]);
     point.z = static_cast<float>(unit.distance * m_sin_elevation_map_[i]);
 
     point.intensity = unit.intensity;
 
     if ("realtime" == m_sTimestampType) {
-      point.timestamp = m_dPktTimestamp;
+        point.timestamp = m_dPktTimestamp + \
+                          (static_cast<double>(blockXTOffsetSingle_[blockid] + laserXTOffset_[i]) / \
+                          1000000.0f);
     }
     else {
       point.timestamp = unix_second + \
